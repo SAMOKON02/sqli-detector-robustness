@@ -1,0 +1,4 @@
+Modified_SQL_Dataset.csv
+__pycache__/
+*.pyc
+.venv/

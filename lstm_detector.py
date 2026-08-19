@@ -1,3 +1,5 @@
+# Deep-learning SQL injection detector: character-level LSTM
+import pickle
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -33,7 +35,7 @@ vocab_size = len(tokenizer.word_index) + 1
 
 # 5. Build the LSTM model
 model = Sequential([
-    Embedding(input_dim=vocab_size, output_dim=32, input_length=MAX_LEN),
+    Embedding(input_dim=vocab_size, output_dim=32),
     LSTM(64),
     Dense(1, activation='sigmoid')
 ])
@@ -42,7 +44,7 @@ model.compile(loss='binary_crossentropy',
               optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-# 6. Train (with early stopping to avoid overfitting)
+# 6. Train with early stopping to avoid overfitting
 early_stop = EarlyStopping(
     monitor='val_loss', patience=2, restore_best_weights=True)
 model.fit(X_train_pad, y_train,
@@ -55,3 +57,9 @@ model.fit(X_train_pad, y_train,
 probs = model.predict(X_test_pad)
 preds = (probs > 0.5).astype(int)
 print(classification_report(y_test, preds))
+
+# Save the trained LSTM model and its tokenizer so we can reuse them later
+model.save("lstm_model.keras")
+with open("lstm_tokenizer.pkl", "wb") as f:
+    pickle.dump(tokenizer, f)
+print("LSTM model and tokenizer saved.")
