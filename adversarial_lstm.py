@@ -10,28 +10,28 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 MAX_LEN = 200
 
-# ---- 1. Load and split (same settings as always) ----
+# Step 1. Load and split (same settings as always)
 df = pd.read_csv("Modified_SQL_Dataset.csv").drop_duplicates()
 X = df['Query'].astype(str)
 y = df['Label']
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42)
 
-# ---- 2. The encoding operator (the disguise that broke the detectors) ----
+# Step 2. The encoding operator (the disguise that broke the detectors)
 
 
 def op_encode(q):
     return q.replace(" ", "%20")
 
 
-# ---- 3. Build encoded attack sets: one for training, one for testing ----
+# Step 3. Build encoded attack sets: one for training, one for testing
 mal_train = X_train[y_train == 1].tolist()
 encoded_train = [op_encode(q) for q in mal_train]
 mal_test = X_test[y_test == 1].tolist()
 encoded_test = [op_encode(q) for q in mal_test]
 benign_test = X_test[y_test == 0].tolist()
 
-# ---- 4. A function that builds, trains and evaluates an LSTM ----
+# Step 4. A function that builds, trains and evaluates an LSTM
 
 
 def build_train_evaluate(train_texts, train_labels, label):
@@ -71,11 +71,11 @@ def build_train_evaluate(train_texts, train_labels, label):
     print(f"   False positives on BENIGN:    {fp_rate:5.1f}%\n")
 
 
-# ---- 5. BEFORE: train on normal data only ----
+# Step 5. BEFORE: train on normal data only
 print("=== BEFORE adversarial training (baseline LSTM) ===")
 build_train_evaluate(X_train.tolist(), y_train.tolist(), "Baseline LSTM")
 
-# ---- 6. AFTER: train on normal data + encoded attacks ----
+# Step 6. AFTER: train on normal data + encoded attacks
 print("=== AFTER adversarial training (LSTM + encoded attacks) ===")
 build_train_evaluate(
     X_train.tolist() + encoded_train,

@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ---- Your actual results ----
+# my actual results
 detectors = ['Random Forest', 'LSTM']
 clean = [99.0, 92.2]   # detection on clean attacks
 before_adv = [38.8, 64.0]   # detection on ENCODED attacks (before hardening)

@@ -29,4 +29,4 @@ FULL PICTURE (both detectors):
     Random Forest: 38.8% -> 99.6%   (benign FP steady at 0.1%)
     LSTM:          64.0% -> 99.3%   (benign FP 0.4% -> 0.1%)
   Adversarial training repaired both detectors at no cost to benign accuracy.
-  Replicates Floris et al. (2025) for standalone ML classifiers.
+  Replicates Floris et al. (2025) for standalone ML classifiers.& "C:\Program Files\Python312\python.exe" -m pip install matplotlib

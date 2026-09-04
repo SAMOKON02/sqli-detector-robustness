@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ---- Your actual evasion-harness results ----
+# Your actual evasion-harness results
 operators = ['Baseline\n(no disguise)', 'Comment',
              'Case', 'Whitespace', 'Encoding']
 # Random Forest detection rate per operator
@@ -26,7 +26,7 @@ ax.set_xticklabels(operators)
 ax.set_ylim(0, 110)
 ax.legend()
 
-# put the number on top of each bar
+# Adding the number on top of each bar
 for bars in (bars1, bars2):
     for bar in bars:
         height = bar.get_height()

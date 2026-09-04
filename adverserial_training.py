@@ -5,28 +5,28 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 
-# ---- 1. Load and split the data (same settings as before) ----
+# Step 1. Load and split the data (same settings as before) ----
 df = pd.read_csv("Modified_SQL_Dataset.csv").drop_duplicates()
 X = df['Query'].astype(str)
 y = df['Label']
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42)
 
-# ---- 2. The encoding operator (the one that broke the detectors) ----
+# Step 2. The encoding operator (the one that broke the detectors) ----
 
 
 def op_encode(q):
     return q.replace(" ", "%20")
 
 
-# ---- 3. Take malicious TRAINING queries and make encoded versions ----
+# Step 3. Take malicious TRAINING queries and make encoded versions ----
 mal_train = X_train[y_train == 1].tolist()
 encoded_train = [op_encode(q) for q in mal_train]          # for TRAINING
 # And a separate encoded set from TEST attacks, for honest evaluation
 mal_test = X_test[y_test == 1].tolist()
 encoded_test = [op_encode(q) for q in mal_test]            # for TESTING
 
-# ---- 4. Build TWO training sets: normal, and normal + encoded ----
+# Step 4. Build TWO training sets: normal, and normal + encoded ----
 # Baseline training set (as before)
 X_train_base = X_train.tolist()
 y_train_base = y_train.tolist()
@@ -35,7 +35,7 @@ y_train_base = y_train.tolist()
 X_train_adv = X_train.tolist() + encoded_train
 y_train_adv = y_train.tolist() + [1] * len(encoded_train)
 
-# ---- 5. Helper: train a RF and measure detection on encoded attacks + FP on benign ----
+# Step 5. Helper: train a RF and measure detection on encoded attacks + FP on benign ----
 
 
 def train_and_evaluate(X_tr, y_tr, label):
@@ -58,7 +58,7 @@ def train_and_evaluate(X_tr, y_tr, label):
     print(f"   False positives on BENIGN:    {fp_rate:5.1f}%\n")
 
 
-# ---- 6. Compare: before vs after adversarial training ----
+# Step 6. Compare: before vs after adversarial training
 print("=== BEFORE adversarial training (baseline RF) ===")
 train_and_evaluate(X_train_base, y_train_base, "Baseline")
 

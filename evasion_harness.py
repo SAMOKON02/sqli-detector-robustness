@@ -6,18 +6,18 @@ import pickle
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# ---- 1. Load the dataset and pull out the malicious queries ----
-df = pd.read_csv("Modified_SQL_Dataset.csv").drop_duplicates()
-malicious = df[df['Label'] == 1]['Query'].astype(str).tolist()
+# Step 1. Load the dataset and pull out the malicious queries
+dataset = pd.read_csv("Modified_SQL_Dataset.csv").drop_duplicates()
+malicious = dataset[dataset['Label'] == 1]['Query'].astype(str).tolist()
 # Take a sample of 500 attacks to disguise (as your methodology specifies)
 attacks = malicious[:500]
 print(f"Loaded {len(attacks)} malicious payloads to disguise.")
 
-# ---- 2. Define the obfuscation operators ----
-# Each function disguises a payload while keeping it a valid attack.
+# Step 2. Define the obfuscation operators
+# Each function would disguis a payload while keeping it a valid attack.
 
 
-def op_comment(q):        # insert an inline comment
+def op_comment(q):
     return q.replace(" ", "/**/", 1) if " " in q else q
 
 
@@ -26,7 +26,7 @@ def op_case(q):           # randomise the capitalisation of keywords
                    for i, c in enumerate(q))
 
 
-def op_whitespace(q):     # swap normal spaces for extra whitespace
+def op_whitespace(q):     # swapping normal spaces for extra whitespace
     return q.replace(" ", "  ")
 
 
@@ -41,7 +41,7 @@ operators = {
     "encoding": op_encode,
 }
 
-# ---- 3. Load the two trained detectors ----
+# Step 3. Load the two trained detectors
 rf_model = joblib.load("rf_model.joblib")
 rf_vec = joblib.load("rf_vectoriser.joblib")
 
@@ -50,7 +50,7 @@ with open("lstm_tokenizer.pkl", "rb") as f:
     lstm_tok = pickle.load(f)
 MAX_LEN = 200
 
-# ---- 4. Helper functions: how many attacks does each detector catch? ----
+# Step 4. Helper functions: how many attacks does each detector catch?
 
 
 def rf_detection_rate(payloads):
@@ -67,12 +67,12 @@ def lstm_detection_rate(payloads):
     return np.mean(preds == 1)
 
 
-# ---- 5. Baseline: detection on the ORIGINAL (undisguised) attacks ----
+# Step 5. Baseline: detection on the ORIGINAL (undisguised) attacks
 print("\n=== BASELINE (no disguise) ===")
 print(f"Random Forest catches: {rf_detection_rate(attacks)*100:.1f}%")
 print(f"LSTM catches:          {lstm_detection_rate(attacks)*100:.1f}%")
 
-# ---- 6. Test each operator and measure the drop ----
+# Step 6. Test each operator and measure the drop ----
 print("\n=== UNDER EVASION (per operator) ===")
 for name, func in operators.items():
     disguised = [func(a) for a in attacks]
